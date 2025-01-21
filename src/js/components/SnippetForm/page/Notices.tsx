@@ -2,11 +2,11 @@ import classnames from 'classnames'
 import React, { useEffect } from 'react'
 import { __, sprintf } from '@wordpress/i18n'
 import { useSnippetForm } from '../../../hooks/useSnippetForm'
-import type { MouseEventHandler, ReactNode} from 'react'
+import type { ReactNode } from 'react'
 
 interface DismissibleNoticeProps {
 	classNames?: classnames.Argument
-	onRemove: MouseEventHandler<HTMLButtonElement>
+	onRemove: VoidFunction
 	children?: ReactNode
 	autoHide?: boolean
 }
@@ -14,13 +14,10 @@ interface DismissibleNoticeProps {
 const DismissibleNotice: React.FC<DismissibleNoticeProps> = ({ classNames, onRemove, children, autoHide = true }) => {
 	useEffect(() => {
 		if (autoHide) {
-			const timer = setTimeout(() => {
-				onRemove({} as React.MouseEvent<HTMLButtonElement>)
-			}, 5000)
-			
+			const timer = setTimeout(onRemove, 5000)
 			return () => clearTimeout(timer)
 		}
-		return () => {} // eslint-disable-line
+		return undefined
 	}, [autoHide, onRemove])
 
 	return (
@@ -29,7 +26,7 @@ const DismissibleNotice: React.FC<DismissibleNoticeProps> = ({ classNames, onRem
 
 			<button type="button" className="notice-dismiss" onClick={event => {
 				event.preventDefault()
-				onRemove(event)
+				onRemove()
 			}}>
 				<span className="screen-reader-text">{__('Dismiss notice.', 'code-snippets')}</span>
 			</button>
