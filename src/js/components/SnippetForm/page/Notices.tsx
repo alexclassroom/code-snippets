@@ -2,28 +2,31 @@ import classnames from 'classnames'
 import React, { useEffect } from 'react'
 import { __, sprintf } from '@wordpress/i18n'
 import { useSnippetForm } from '../../../hooks/useSnippetForm'
-import type { MouseEventHandler, ReactNode} from 'react'
+import type { ReactNode } from 'react'
 
 interface DismissibleNoticeProps {
 	classNames?: classnames.Argument
-	onRemove: MouseEventHandler<HTMLButtonElement>
+	onRemove: VoidFunction
 	children?: ReactNode
+	autoHide?: boolean
 }
 
-const DismissibleNotice: React.FC<DismissibleNoticeProps> = ({ classNames, onRemove, children }) => {
+const DismissibleNotice: React.FC<DismissibleNoticeProps> = ({ classNames, onRemove, children, autoHide = true }) => {
 	useEffect(() => {
-		if (window.CODE_SNIPPETS_EDIT?.scrollToNotices) {
-			window.scrollTo({ top: 0, behavior: 'smooth' })
+		if (autoHide) {
+			const timer = setTimeout(onRemove, 5000)
+			return () => clearTimeout(timer)
 		}
-	}, [])
+		return undefined
+	}, [autoHide, onRemove])
 
 	return (
-		<div id="message" className={classnames('notice fade is-dismissible', classNames)}>
+		<div id="message" className={classnames('cs-sticky-notice notice fade is-dismissible', classNames)}>
 			<>{children}</>
 
 			<button type="button" className="notice-dismiss" onClick={event => {
 				event.preventDefault()
-				onRemove(event)
+				onRemove()
 			}}>
 				<span className="screen-reader-text">{__('Dismiss notice.', 'code-snippets')}</span>
 			</button>
@@ -45,6 +48,7 @@ export const Notices: React.FC = () => {
 			<DismissibleNotice
 				classNames="error"
 				onRemove={() => setSnippet(previous => ({ ...previous, code_error: null }))}
+				autoHide={false}
 			>
 				<p>
 					<strong>{sprintf(
