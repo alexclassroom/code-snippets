@@ -240,7 +240,7 @@ class Front_End {
 	 *
 	 * @return string Evaluated shortcode content.
 	 */
-	protected function evaluate_shortcode_content( Snippet $snippet, array $atts ): string {	
+	protected function evaluate_shortcode_content( Snippet $snippet, array $atts ): string {
 		if ( empty( $atts['php'] ) ) {
 			return $snippet->code;
 		}
@@ -332,19 +332,20 @@ class Front_End {
 
 			// Recursion depth is limited to prevent infinite loops.
 			static $depth = 0;
-			$max_depth = self::MAX_SHORTCODE_DEPTH;
 
 			// Find the shortcode in the content and replace it with the evaluated content.
 			$content = preg_replace_callback(
-				'/\[' . self::CONTENT_SHORTCODE . '([^\]]*)\]/',
-				function ($matches) use (&$depth, $max_depth) {
-					if ($depth >= $max_depth) {
+				'/\[' . self::CONTENT_SHORTCODE . '([^]]*)]/',
+				function ( $matches ) use ( &$depth ) {
+					if ( $depth >= self::MAX_SHORTCODE_DEPTH ) {
 						return '<!-- Max shortcode depth reached -->';
 					}
+
 					$depth++;
-					$atts = shortcode_parse_atts($matches[1]);
-					$result = $this->render_content_shortcode($atts);
+					$atts = shortcode_parse_atts( $matches[1] );
+					$result = $this->render_content_shortcode( $atts );
 					$depth--;
+
 					return $result;
 				},
 				$content
