@@ -1019,8 +1019,8 @@ class List_Table extends WP_List_Table {
 
 		// Count the totals for each section.
 		$totals = array_map(
-			function ( $list ) {
-				return count( $list );
+			function ( $section_snippets ) {
+				return count( $section_snippets );
 			},
 			$snippets
 		);
