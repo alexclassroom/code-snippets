@@ -4,7 +4,6 @@ namespace Code_Snippets\Cloud;
 
 use Code_Snippets\Snippet;
 use WP_Error;
-use function Code_Snippets\code_snippets;
 use function Code_Snippets\get_snippet_by_cloud_id;
 use function Code_Snippets\get_snippets;
 use function Code_Snippets\save_snippet;
@@ -68,43 +67,6 @@ class Cloud_API {
 		return defined( 'CS_CLOUD_API_URL' )
 			? CS_CLOUD_API_URL
 			: self::get_cloud_url() . 'api/v1/';
-	}
-
-	/**
-	 * Retrieve cloud settings.
-	 *
-	 * @return array
-	 */
-	private static function get_cloud_settings(): array {
-		static $settings = null;
-
-		if ( ! is_null( $settings ) ) {
-			return $settings;
-		}
-
-		$settings = wp_cache_get( self::CLOUD_SETTINGS_CACHE_KEY );
-		if ( $settings ) {
-			return $settings;
-		}
-
-		$settings = get_option( self::CLOUD_SETTINGS_CACHE_KEY );
-
-		// Check if the settings exist in the database if not create defaults.
-		if ( false === $settings ) {
-			$settings = [
-				'cloud_token'    => '',
-				'local_token'    => '',
-				'token_verified' => false,
-				'code_verifier'  => '',
-				'code_challenge' => '',
-				'state'          => '',
-			];
-
-			update_option( self::CLOUD_SETTINGS_CACHE_KEY, $settings );
-		}
-
-		wp_cache_set( self::CLOUD_SETTINGS_CACHE_KEY, $settings );
-		return $settings;
 	}
 
 	/**
@@ -335,6 +297,8 @@ class Cloud_API {
 	 * @param string     $action   The action to be performed: 'download' or 'update'.
 	 *
 	 * @return array<string, string|bool> Result of operation: an array with `success` and `error_message` keys.
+	 *
+	 * @noinspection PhpUnusedParameterInspection
 	 */
 	public function download_or_update_snippet( int $cloud_id, string $source, string $action ): array {
 		$cloud_id = intval( $cloud_id );
