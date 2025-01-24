@@ -4,6 +4,8 @@ import { __, sprintf } from '@wordpress/i18n'
 import { useSnippetForm } from '../../../hooks/useSnippetForm'
 import type { ReactNode } from 'react'
 
+const NOTICE_TIMEOUT_MS = 5000
+
 interface DismissibleNoticeProps {
 	classNames?: classnames.Argument
 	onRemove: VoidFunction
@@ -14,7 +16,7 @@ interface DismissibleNoticeProps {
 const DismissibleNotice: React.FC<DismissibleNoticeProps> = ({ classNames, onRemove, children, autoHide = true }) => {
 	useEffect(() => {
 		if (autoHide) {
-			const timer = setTimeout(onRemove, 5000)
+			const timer = setTimeout(onRemove, NOTICE_TIMEOUT_MS)
 			return () => clearTimeout(timer)
 		}
 		return undefined
@@ -38,14 +40,14 @@ export const Notices: React.FC = () => {
 	const { currentNotice, setCurrentNotice, snippet, setSnippet } = useSnippetForm()
 
 	return <>
-		{currentNotice ?
-			<DismissibleNotice classNames={currentNotice[0]} onRemove={() => setCurrentNotice(undefined)}>
+		{currentNotice
+			? <DismissibleNotice classNames={currentNotice[0]} onRemove={() => setCurrentNotice(undefined)}>
 				<p>{currentNotice[1]}</p>
-			</DismissibleNotice> :
-			null}
+			</DismissibleNotice>
+			: null}
 
-		{snippet.code_error ?
-			<DismissibleNotice
+		{snippet.code_error
+			? <DismissibleNotice
 				classNames="error"
 				onRemove={() => setSnippet(previous => ({ ...previous, code_error: null }))}
 				autoHide={false}
@@ -59,7 +61,7 @@ export const Notices: React.FC = () => {
 
 					<blockquote>{snippet.code_error[0]}</blockquote>
 				</p>
-			</DismissibleNotice> :
-			null}
+			</DismissibleNotice>
+			: null}
 	</>
 }

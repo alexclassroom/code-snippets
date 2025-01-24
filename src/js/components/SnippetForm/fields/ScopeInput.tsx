@@ -10,7 +10,9 @@ import { useSnippetForm } from '../../../hooks/useSnippetForm'
 import { truncateWords } from '../../../utils/text'
 import type { ShortcodeAtts } from '../../../utils/shortcodes'
 import type { SnippetScope } from '../../../types/Snippet'
-import type { Dispatch, SetStateAction} from 'react'
+import type { Dispatch, SetStateAction } from 'react'
+
+const MAX_SHORTCODE_NAME_WORDS = 3
 
 const SHORTCODE_TAG = 'code_snippet'
 
@@ -96,16 +98,16 @@ const ShortcodeInfo: React.FC = () => {
 		shortcodes: false
 	}))
 
-	return 'content' === snippet.scope ?
-		<>
+	return 'content' === snippet.scope
+		? <>
 			<p className="description">
 				{__('There are multiple options for inserting this snippet into a post, page or other content.', 'code-snippets')}
 				{' '}
-				{snippet.id ?
+				{snippet.id
 					// eslint-disable-next-line @stylistic/max-len
-					__('You can copy the below shortcode, or use the Classic Editor button, Block editor (Pro) or Elementor widget (Pro).', 'code-snippets') :
+					? __('You can copy the below shortcode, or use the Classic Editor button, Block editor (Pro) or Elementor widget (Pro).', 'code-snippets')
 					// eslint-disable-next-line @stylistic/max-len
-					__('After saving, you can copy a shortcode, or use the Classic Editor button, Block editor (Pro) or Elementor widget (Pro).', 'code-snippets')}
+					: __('After saving, you can copy a shortcode, or use the Classic Editor button, Block editor (Pro) or Elementor widget (Pro).', 'code-snippets')}
 				{' '}
 				<ExternalLink
 					href={__('https://help.codesnippets.pro/article/50-inserting-snippets', 'code-snippets')}
@@ -114,11 +116,11 @@ const ShortcodeInfo: React.FC = () => {
 				</ExternalLink>
 			</p>
 
-			{snippet.id ?
-				<>
+			{snippet.id
+				? <>
 					<ShortcodeTag atts={{
 						id: snippet.id,
-						name: truncateWords(snippet.name),
+						name: truncateWords(snippet.name, MAX_SHORTCODE_NAME_WORDS),
 						network: snippet.network ?? isNetworkAdmin(),
 						...options
 					}} />
@@ -133,8 +135,10 @@ const ShortcodeInfo: React.FC = () => {
 							['shortcodes', __('Evaluate additional shortcode tags', 'code-snippets')]
 						]}
 					/>
-				</> : null}
-		</> : null
+				</>
+				: null}
+		</>
+		: null
 }
 
 export const ScopeInput: React.FC = () => {
